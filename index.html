@@ -1,3 +1,8 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>J'ai Rien À Faire</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Space+Mono:wght@400;700&display=swap');
@@ -57,7 +62,9 @@
   }
 
   *{ box-sizing: border-box; }
+  html{ color-scheme: light dark; }
   body{
+    margin: 0;
     background: var(--bg-behind);
     color: var(--ink);
     display: flex;
@@ -369,6 +376,8 @@
     .touch-pad{ display: none; }
   }
 </style>
+</head>
+<body>
 
 <div class="sheet" id="sheet">
   <div class="tape t1"></div>
@@ -986,3 +995,5 @@
     })();
   })();
 </script>
+</body>
+</html>
