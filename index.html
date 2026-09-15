@@ -1,0 +1,988 @@
+<title>J'ai Rien À Faire</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Space+Mono:wght@400;700&display=swap');
+
+  :root{
+    --paper: #faf9f2;
+    --grid-line: rgba(64,96,168,0.16);
+    --margin-line: rgba(214,40,57,0.45);
+    --ink: #1c1e2b;
+    --ink-soft: #4a4e63;
+    --pen: #1b3fa0;
+    --pen-soft: rgba(27,63,160,0.12);
+    --red: #d62839;
+    --red-soft: rgba(214,40,57,0.1);
+    --highlight: #ffe066;
+    --highlight-soft: rgba(255,224,102,0.55);
+    --tape: rgba(255,224,102,0.65);
+    --tape2: rgba(180,225,151,0.6);
+    --shadow: rgba(30,34,54,0.18);
+    --bg-behind: #eceada;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper: #1a1d2b;
+      --grid-line: rgba(140,170,255,0.14);
+      --margin-line: rgba(255,110,110,0.4);
+      --ink: #e9ecf7;
+      --ink-soft: #aab0cf;
+      --pen: #8fb4ff;
+      --pen-soft: rgba(143,180,255,0.14);
+      --red: #ff6b6b;
+      --red-soft: rgba(255,107,107,0.12);
+      --highlight: #f2e26a;
+      --highlight-soft: rgba(242,226,106,0.28);
+      --tape: rgba(242,226,106,0.3);
+      --tape2: rgba(150,210,150,0.28);
+      --shadow: rgba(0,0,0,0.5);
+      --bg-behind: #0f111a;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper: #1a1d2b;
+    --grid-line: rgba(140,170,255,0.14);
+    --margin-line: rgba(255,110,110,0.4);
+    --ink: #e9ecf7;
+    --ink-soft: #aab0cf;
+    --pen: #8fb4ff;
+    --pen-soft: rgba(143,180,255,0.14);
+    --red: #ff6b6b;
+    --red-soft: rgba(255,107,107,0.12);
+    --highlight: #f2e26a;
+    --highlight-soft: rgba(242,226,106,0.28);
+    --tape: rgba(242,226,106,0.3);
+    --tape2: rgba(150,210,150,0.28);
+    --shadow: rgba(0,0,0,0.5);
+    --bg-behind: #0f111a;
+  }
+
+  *{ box-sizing: border-box; }
+  body{
+    background: var(--bg-behind);
+    color: var(--ink);
+    display: flex;
+    justify-content: center;
+    padding: clamp(20px, 5vw, 56px) 16px;
+    padding-block: clamp(24px, 6vw, 64px);
+  }
+  h1,h2,h3{ text-wrap: balance; margin: 0; }
+
+  .sheet{
+    position: relative;
+    width: 100%;
+    max-width: 760px;
+    background:
+      linear-gradient(to right, transparent 0 46px, var(--margin-line) 46px 47.5px, transparent 47.5px) ,
+      repeating-linear-gradient(to bottom, transparent 0 29px, var(--grid-line) 29px 30px),
+      var(--paper);
+    border-radius: 3px;
+    box-shadow: 0 22px 50px -20px var(--shadow), 0 2px 0 var(--shadow);
+    padding: 40px clamp(20px, 5vw, 52px) 36px;
+    transform: rotate(-0.4deg);
+    overflow: hidden;
+  }
+
+  .tape{
+    position: absolute;
+    width: 96px;
+    height: 30px;
+    top: -12px;
+    background: var(--tape);
+    box-shadow: 0 2px 6px var(--shadow);
+    opacity: 0.9;
+  }
+  .tape.t1{ left: 36px; transform: rotate(-7deg); }
+  .tape.t2{ right: 48px; transform: rotate(5deg); background: var(--tape2); }
+
+  .doodle{ position: absolute; color: var(--ink-soft); opacity: 0.55; pointer-events: none; }
+  .doodle.tictactoe{ top: 14px; right: 18px; width: 62px; }
+  .doodle.spiral{ bottom: 96px; left: -6px; width: 58px; }
+  .doodle.plane{ bottom: 18px; right: 4px; width: 74px; }
+  .doodle.clock{ top: 100px; left: -10px; width: 48px; }
+  @media (max-width: 620px){
+    .doodle{ display: none; }
+  }
+
+  .letterhead{
+    font-family: 'Space Mono', 'Courier New', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    border-bottom: 1px solid var(--grid-line);
+    padding-bottom: 14px;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .letterhead strong{ color: var(--ink); letter-spacing: 0.06em; }
+
+  .fields{
+    margin-top: 18px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(140px,1fr));
+    gap: 10px 28px;
+    font-family: 'Space Mono', 'Courier New', monospace;
+    font-size: 0.82rem;
+  }
+  .field{ display: flex; align-items: baseline; gap: 6px; color: var(--ink-soft); }
+  .field .val{
+    font-family: 'Caveat', cursive;
+    font-size: 1.25rem;
+    color: var(--pen);
+    border-bottom: 1px dotted var(--ink-soft);
+    padding: 0 4px 1px;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .consigne{
+    margin-top: 30px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .consigne::before{ content: "Consigne — "; color: var(--red); }
+
+  .hero{
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: clamp(2.9rem, 12vw, 6.4rem);
+    line-height: 0.95;
+    color: var(--pen);
+    transform: rotate(-2deg);
+    margin: 10px 0 4px -4px;
+    cursor: default;
+    display: inline-block;
+    transition: transform 0.15s ease;
+  }
+  .hero mark{
+    background: var(--highlight-soft);
+    color: inherit;
+    padding: 0 6px;
+    border-radius: 2px 10px 3px 8px/8px 3px 10px 2px;
+  }
+  .hero.shake{ animation: shake 0.4s ease; }
+  @keyframes shake{
+    0%,100%{ transform: rotate(-2deg); }
+    25%{ transform: rotate(1.5deg) translateX(-3px); }
+    50%{ transform: rotate(-3.5deg) translateX(3px); }
+    75%{ transform: rotate(0.5deg) translateX(-2px); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .hero.shake{ animation: none; }
+  }
+
+  .annotation{
+    font-family: 'Caveat', cursive;
+    font-size: 1.4rem;
+    color: var(--red);
+    transform: rotate(-1deg);
+    margin-bottom: 30px;
+  }
+
+  .exercices{ display: flex; flex-direction: column; gap: 22px; margin-top: 8px; }
+  .exercice{
+    border: 1px solid var(--grid-line);
+    background: var(--pen-soft);
+    border-radius: 2px;
+    padding: 16px 18px 18px;
+  }
+  .exercice h2{
+    font-family: 'Space Mono', monospace;
+    font-size: 0.86rem;
+    letter-spacing: 0.04em;
+    color: var(--ink);
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .exercice h2 .num{
+    font-family: 'Caveat', cursive;
+    font-size: 1.5rem;
+    color: var(--red);
+    font-weight: 700;
+  }
+
+  .meter-row{ display: flex; flex-direction: column; gap: 8px; }
+  input[type="range"]{
+    -webkit-appearance: none;
+    width: 100%;
+    height: 10px;
+    border-radius: 6px;
+    background: linear-gradient(to right, var(--pen) 0 100%, var(--grid-line) 0);
+    outline-offset: 4px;
+  }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance: none;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--red);
+    border: 3px solid var(--paper);
+    box-shadow: 0 0 0 1px var(--red);
+    cursor: pointer;
+  }
+  input[type="range"]::-moz-range-thumb{
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--red);
+    border: 3px solid var(--paper);
+    box-shadow: 0 0 0 1px var(--red);
+    cursor: pointer;
+  }
+  .meter-label{
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    display: flex;
+    justify-content: space-between;
+  }
+  #meter-msg{ color: var(--red); font-style: normal; }
+
+  .btn{
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.03em;
+    background: var(--paper);
+    color: var(--ink);
+    border: 1.5px solid var(--ink);
+    border-radius: 2px;
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: transform 0.12s ease, background 0.15s ease;
+  }
+  .btn:hover{ background: var(--highlight-soft); transform: translateY(-1px) rotate(-0.5deg); }
+  .btn:active{ transform: translateY(0) rotate(0deg); }
+  .btn:focus-visible{ outline: 2px solid var(--red); outline-offset: 3px; }
+
+  .flemme-row{ display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .flemme-count{
+    font-family: 'Caveat', cursive;
+    font-size: 2.4rem;
+    color: var(--pen);
+    font-variant-numeric: tabular-nums;
+    min-width: 2.2ch;
+  }
+  #flemme-badge{
+    font-family: 'Space Mono', monospace;
+    font-size: 0.74rem;
+    color: var(--red);
+    min-height: 1.2em;
+  }
+
+  .gen-row{ display: flex; flex-direction: column; gap: 12px; }
+  #gen-output{
+    font-family: 'Caveat', cursive;
+    font-size: 1.5rem;
+    color: var(--ink);
+    min-height: 2.4em;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px dotted var(--grid-line);
+    padding-bottom: 8px;
+  }
+
+  footer{
+    margin-top: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+    flex-wrap: wrap;
+    border-top: 1px solid var(--grid-line);
+    padding-top: 16px;
+  }
+  .stamp{
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--red);
+    border: 3px solid var(--red);
+    border-radius: 50% 8% 50% 8%/8% 50% 8% 50%;
+    padding: 6px 16px;
+    transform: rotate(-8deg);
+    opacity: 0.85;
+    white-space: nowrap;
+  }
+  .fineprint{
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--ink-soft);
+    max-width: 34ch;
+  }
+
+  .game-wrap{ display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .game-hud{
+    width: 100%;
+    max-width: 320px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    font-variant-numeric: tabular-nums;
+  }
+  canvas.game-canvas{
+    width: 100%;
+    max-width: 320px;
+    height: auto;
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    border-radius: 2px;
+    touch-action: none;
+    cursor: pointer;
+  }
+  canvas.game-canvas:focus-visible{ outline: 2px solid var(--red); outline-offset: 3px; }
+  .game-hint{
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--ink-soft);
+    text-align: center;
+    margin: 0;
+  }
+  .touch-pad{ display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .touch-pad .trow{ display: flex; gap: 4px; }
+  .tbtn{
+    width: 40px; height: 40px;
+    font-family: 'Space Mono', monospace;
+    font-size: 1rem;
+    background: var(--paper);
+    color: var(--ink);
+    border: 1.5px solid var(--ink);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .tbtn:hover{ background: var(--highlight-soft); }
+  .tbtn:active{ transform: translateY(1px); }
+  .tbtn:focus-visible{ outline: 2px solid var(--red); outline-offset: 2px; }
+  @media (min-width: 621px){
+    .touch-pad{ display: none; }
+  }
+</style>
+
+<div class="sheet" id="sheet">
+  <div class="tape t1"></div>
+  <div class="tape t2"></div>
+
+  <svg class="doodle tictactoe" viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+    <path d="M20 4 L18 56"/><path d="M40 6 L38 54"/>
+    <path d="M4 20 L56 18"/><path d="M6 40 L54 42"/>
+    <path d="M8 12 L16 20 M16 12 L8 20"/>
+    <circle cx="29" cy="29" r="6"/>
+  </svg>
+  <svg class="doodle spiral" viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+    <path d="M30 30 C30 20 45 20 45 30 C45 42 25 42 25 28 C25 12 48 12 48 30 C48 50 15 50 15 26"/>
+  </svg>
+  <svg class="doodle plane" viewBox="0 0 90 50" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 40 L46 6 L38 22 L60 20 L38 30 L46 44 Z"/>
+    <path d="M2 44 C20 34 34 30 62 22" stroke-dasharray="2 5"/>
+  </svg>
+  <svg class="doodle clock" viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+    <circle cx="30" cy="28" r="18"/>
+    <path d="M30 28 L30 16"/>
+    <path d="M30 28 C36 34 40 40 34 44"/>
+    <path d="M14 50 C24 54 36 54 46 50" stroke-dasharray="1 4"/>
+  </svg>
+
+  <div class="letterhead">
+    <strong>Ministère de la Flemme Nationale</strong>
+    <span>Fiche d'activité — Salle d'étude</span>
+  </div>
+
+  <div class="fields">
+    <div class="field">Nom : <span class="val">Moi</span></div>
+    <div class="field">Classe : <span class="val">3<sup>e</sup>, au fond</span></div>
+    <div class="field">Matière : <span class="val">Étude surveillée</span></div>
+    <div class="field">Date : <span class="val" id="date-field">—</span></div>
+  </div>
+
+  <p class="consigne">Décris ton état actuel en lettres capitales.</p>
+
+  <h1 class="hero" id="hero" tabindex="0">J'AI <mark>RIEN</mark> À FAIRE</h1>
+  <p class="annotation">(véridique, signé et daté)</p>
+
+  <div class="exercices">
+    <section class="exercice">
+      <h2><span class="num">Exercice 1</span> — Mesure ton ennui</h2>
+      <div class="meter-row">
+        <input type="range" id="ennui" min="0" max="100" value="100" aria-label="Niveau d'ennui">
+        <div class="meter-label">
+          <span>0 % (impossible)</span>
+          <span id="meter-msg">100 % — comme d'habitude</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="exercice">
+      <h2><span class="num">Exercice 2</span> — Compteur de flemme officiel</h2>
+      <div class="flemme-row">
+        <span class="flemme-count" id="flemme-count">0</span>
+        <button class="btn" id="flemme-btn" type="button">Cliquer ici (ça compte comme un effort)</button>
+      </div>
+      <p id="flemme-badge"></p>
+    </section>
+
+    <section class="exercice">
+      <h2><span class="num">Exercice 3</span> — Générateur d'occupations (déconseillé par le surveillant)</h2>
+      <div class="gen-row">
+        <p id="gen-output">Clique sur le bouton pour recevoir une idée brillante.</p>
+        <button class="btn" id="gen-btn" type="button" style="align-self: flex-start;">Occupe-moi (mal)</button>
+      </div>
+    </section>
+
+    <section class="exercice">
+      <h2><span class="num">Jeu 1</span> — Serpent de marge</h2>
+      <div class="game-wrap">
+        <div class="game-hud">
+          <span>Score : <span id="snake-score">0</span></span>
+          <span>Record : <span id="snake-best">0</span></span>
+        </div>
+        <canvas class="game-canvas" id="snake-canvas" width="320" height="320" tabindex="0" aria-label="Jeu du serpent — flèches ou boutons pour bouger"></canvas>
+        <p class="game-hint">Clique sur le jeu, puis flèches / WASD (ou les boutons) pour bouger.</p>
+        <div class="touch-pad">
+          <button class="tbtn" id="snake-up" type="button" aria-label="Haut">▲</button>
+          <div class="trow">
+            <button class="tbtn" id="snake-left" type="button" aria-label="Gauche">◀</button>
+            <button class="tbtn" id="snake-down" type="button" aria-label="Bas">▼</button>
+            <button class="tbtn" id="snake-right" type="button" aria-label="Droite">▶</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="exercice">
+      <h2><span class="num">Jeu 2</span> — Le dino qui esquive les devoirs</h2>
+      <div class="game-wrap">
+        <div class="game-hud">
+          <span>Distance : <span id="dino-score">0</span> m</span>
+          <button class="tbtn" id="dino-mute" type="button" aria-label="Activer ou couper le son" style="width:28px;height:28px;font-size:0.8rem;">🔇</button>
+          <span>Record : <span id="dino-best">0</span> m</span>
+        </div>
+        <canvas class="game-canvas" id="dino-canvas" width="320" height="160" tabindex="0" aria-label="Jeu du dino — espace ou tap pour sauter, flèche bas pour s'accroupir"></canvas>
+        <p class="game-hint">Espace / haut / tap pour sauter — flèche bas pour t'accroupir sous les avions en papier.</p>
+        <div class="touch-pad">
+          <button class="tbtn" id="dino-duck" type="button" aria-label="S'accroupir" style="width:auto; padding:0 14px;">▼ Accroupi</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    <p class="fineprint">Ne pas rendre ce devoir. À conserver précieusement jusqu'à la sonnerie. Toute ressemblance avec un vrai travail scolaire serait purement fortuite.</p>
+    <span class="stamp">Vu, non lu</span>
+  </footer>
+</div>
+
+<script>
+  (function(){
+    var dateField = document.getElementById('date-field');
+    var months = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+    var d = new Date();
+    dateField.textContent = d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+
+    var hero = document.getElementById('hero');
+    function shakeHero(){
+      hero.classList.remove('shake');
+      void hero.offsetWidth;
+      hero.classList.add('shake');
+    }
+    hero.addEventListener('click', shakeHero);
+    hero.addEventListener('keydown', function(e){ if(e.key === 'Enter' || e.key === ' '){ shakeHero(); } });
+
+    var ennui = document.getElementById('ennui');
+    var meterMsg = document.getElementById('meter-msg');
+    var ennuiTiers = [
+      { min: 90, text: "100 % — au moins t'es honnête" },
+      { min: 70, text: "Encore un peu de mauvaise foi ?" },
+      { min: 40, text: "Bof. On n'y croit qu'à moitié." },
+      { min: 15, text: "Le surveillant n'y croit pas." },
+      { min: 0,  text: "Menteur. Ou t'as un devoir à rendre." }
+    ];
+    function updateEnnui(){
+      var v = Number(ennui.value);
+      ennui.style.background = 'linear-gradient(to right, var(--pen) 0 ' + v + '%, var(--grid-line) 0)';
+      for (var i = 0; i < ennuiTiers.length; i++){
+        if (v >= ennuiTiers[i].min){ meterMsg.textContent = ennuiTiers[i].text; break; }
+      }
+    }
+    ennui.addEventListener('input', updateEnnui);
+    updateEnnui();
+
+    var flemmeCount = 0;
+    try { flemmeCount = parseInt(localStorage.getItem('jrf-flemme') || '0', 10) || 0; } catch(e){}
+    var countEl = document.getElementById('flemme-count');
+    var badgeEl = document.getElementById('flemme-badge');
+    countEl.textContent = flemmeCount;
+    var milestones = [
+      [1, "Premier clic. Beau début de non-carrière."],
+      [10, "10 clics. Le surveillant n'a rien vu."],
+      [25, "Palier 25 — Flemme confirmée."],
+      [50, "50 clics. Toujours rien à faire."],
+      [100, "100 clics. Niveau : légende de l'étude."],
+      [250, "250 clics. Il reste combien de temps ?"]
+    ];
+    function updateBadge(){
+      for (var i = milestones.length - 1; i >= 0; i--){
+        if (flemmeCount === milestones[i][0]){ badgeEl.textContent = "🏆 " + milestones[i][1]; return; }
+      }
+    }
+    document.getElementById('flemme-btn').addEventListener('click', function(){
+      flemmeCount++;
+      countEl.textContent = flemmeCount;
+      try { localStorage.setItem('jrf-flemme', String(flemmeCount)); } catch(e){}
+      updateBadge();
+    });
+
+    var ideas = [
+      "Compter les carreaux du cahier. Il y en a beaucoup.",
+      "Faire une origami avec la feuille de brouillon.",
+      "Deviner l'heure sans regarder l'horloge.",
+      "Écrire ton prénom en gothique dans la marge.",
+      "Observer le surveillant observer la salle.",
+      "Réviser une matière au hasard, juste pour le sport.",
+      "Compter combien de fois quelqu'un soupire.",
+      "Dessiner un labyrinthe impossible à finir.",
+      "Faire la liste de tout sauf ce qu'il faut faire.",
+      "Apprendre à faire craquer un doigt en silence.",
+      "Regarder par la fenêtre comme si de rien n'était.",
+      "Relire cette fiche. Elle ne s'améliore pas."
+    ];
+    var lastIdea = -1;
+    document.getElementById('gen-btn').addEventListener('click', function(){
+      var i;
+      do { i = Math.floor(Math.random() * ideas.length); } while (i === lastIdea && ideas.length > 1);
+      lastIdea = i;
+      document.getElementById('gen-output').textContent = ideas[i];
+    });
+
+    function isDarkTheme(){
+      var attr = document.documentElement.getAttribute('data-theme');
+      if (attr === 'dark') return true;
+      if (attr === 'light') return false;
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    function gamePalette(){
+      return isDarkTheme()
+        ? { paper:'#1a1d2b', grid:'rgba(140,170,255,0.16)', ink:'#e9ecf7', pen:'#8fb4ff', red:'#ff6b6b', leaf:'#8fd18f' }
+        : { paper:'#faf9f2', grid:'rgba(64,96,168,0.18)', ink:'#1c1e2b', pen:'#1b3fa0', red:'#d62839', leaf:'#4c9a53' };
+    }
+
+    // --- Jeu du serpent ---
+    (function(){
+      var canvas = document.getElementById('snake-canvas');
+      var ctx = canvas.getContext('2d');
+      var cols = 20, rows = 20, cell = canvas.width / cols;
+      var scoreEl = document.getElementById('snake-score');
+      var bestEl = document.getElementById('snake-best');
+      var best = 0;
+      try { best = parseInt(localStorage.getItem('jrf-snake-best') || '0', 10) || 0; } catch(e){}
+      bestEl.textContent = best;
+
+      var snake, dir, pendingDir, food, score, running, over, timer;
+
+      function reset(){
+        snake = [{x:8,y:10},{x:7,y:10},{x:6,y:10}];
+        dir = {x:1,y:0};
+        pendingDir = dir;
+        score = 0;
+        over = false;
+        running = false;
+        clearInterval(timer);
+        scoreEl.textContent = score;
+        placeFood();
+        draw();
+      }
+      function placeFood(){
+        var ok = false, x, y;
+        while(!ok){
+          x = Math.floor(Math.random()*cols);
+          y = Math.floor(Math.random()*rows);
+          ok = !snake.some(function(s){ return s.x===x && s.y===y; });
+        }
+        food = {x:x, y:y};
+      }
+      function setDir(nx, ny){
+        if (over) { reset(); return; }
+        if (nx === -dir.x && ny === -dir.y) return;
+        pendingDir = {x:nx, y:ny};
+        if (!running){ running = true; clearInterval(timer); timer = setInterval(step, 130); }
+      }
+      function step(){
+        dir = pendingDir;
+        var head = {x: snake[0].x + dir.x, y: snake[0].y + dir.y};
+        if (head.x < 0 || head.x >= cols || head.y < 0 || head.y >= rows || snake.some(function(s){ return s.x===head.x && s.y===head.y; })){
+          gameOver();
+          return;
+        }
+        snake.unshift(head);
+        if (head.x === food.x && head.y === food.y){
+          score++;
+          scoreEl.textContent = score;
+          if (score > best){ best = score; bestEl.textContent = best; try { localStorage.setItem('jrf-snake-best', String(best)); } catch(e){} }
+          placeFood();
+        } else {
+          snake.pop();
+        }
+        draw();
+      }
+      function gameOver(){
+        over = true;
+        running = false;
+        clearInterval(timer);
+        draw();
+      }
+      function draw(){
+        var p = gamePalette();
+        ctx.fillStyle = p.paper;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = p.grid;
+        ctx.lineWidth = 1;
+        for (var i=0;i<=cols;i++){ ctx.beginPath(); ctx.moveTo(i*cell,0); ctx.lineTo(i*cell,canvas.height); ctx.stroke(); }
+        for (var j=0;j<=rows;j++){ ctx.beginPath(); ctx.moveTo(0,j*cell); ctx.lineTo(canvas.width,j*cell); ctx.stroke(); }
+
+        var fx = food.x*cell + cell/2, fy = food.y*cell + cell/2;
+        ctx.fillStyle = p.red;
+        ctx.beginPath(); ctx.arc(fx, fy, cell*0.32, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = p.leaf;
+        ctx.fillRect(fx-2, fy-cell*0.42, 5, 6);
+
+        ctx.strokeStyle = p.pen;
+        ctx.lineWidth = cell*0.7;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        snake.forEach(function(s, idx){
+          var cx = s.x*cell + cell/2, cy = s.y*cell + cell/2;
+          if (idx===0) ctx.moveTo(cx,cy); else ctx.lineTo(cx,cy);
+        });
+        ctx.stroke();
+
+        var head = snake[0];
+        var hx = head.x*cell + cell/2, hy = head.y*cell + cell/2;
+        var ex = -dir.y*cell*0.15, ey = dir.x*cell*0.15;
+        ctx.fillStyle = '#fff';
+        ctx.beginPath(); ctx.arc(hx+ex, hy+ey, cell*0.12, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(hx-ex, hy-ey, cell*0.12, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = p.ink;
+        ctx.beginPath(); ctx.arc(hx+ex, hy+ey, cell*0.05, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(hx-ex, hy-ey, cell*0.05, 0, Math.PI*2); ctx.fill();
+
+        if (!running && !over){
+          ctx.fillStyle = p.ink;
+          ctx.font = "600 20px 'Caveat', cursive";
+          ctx.textAlign = 'center';
+          ctx.fillText('Clique ou appuie sur une flèche', canvas.width/2, canvas.height/2);
+        }
+        if (over){
+          ctx.fillStyle = 'rgba(0,0,0,0.35)';
+          ctx.fillRect(0,0,canvas.width,canvas.height);
+          ctx.fillStyle = p.red;
+          ctx.font = "700 32px 'Caveat', cursive";
+          ctx.textAlign = 'center';
+          ctx.fillText('Perdu — score ' + score, canvas.width/2, canvas.height/2 - 8);
+          ctx.font = "600 16px 'Caveat', cursive";
+          ctx.fillText('Clique pour rejouer', canvas.width/2, canvas.height/2 + 22);
+        }
+      }
+
+      canvas.addEventListener('keydown', function(e){
+        var k = e.key.toLowerCase();
+        if (['arrowup','arrowdown','arrowleft','arrowright',' ','w','a','s','d'].indexOf(k) !== -1) e.preventDefault();
+        if (k==='arrowup'||k==='w') setDir(0,-1);
+        else if (k==='arrowdown'||k==='s') setDir(0,1);
+        else if (k==='arrowleft'||k==='a') setDir(-1,0);
+        else if (k==='arrowright'||k==='d') setDir(1,0);
+      });
+      canvas.addEventListener('click', function(){ canvas.focus(); if (over) reset(); });
+      document.getElementById('snake-up').addEventListener('click', function(){ canvas.focus(); setDir(0,-1); });
+      document.getElementById('snake-down').addEventListener('click', function(){ canvas.focus(); setDir(0,1); });
+      document.getElementById('snake-left').addEventListener('click', function(){ canvas.focus(); setDir(-1,0); });
+      document.getElementById('snake-right').addEventListener('click', function(){ canvas.focus(); setDir(1,0); });
+
+      reset();
+    })();
+
+    // --- Jeu du dino ---
+    (function(){
+      var canvas = document.getElementById('dino-canvas');
+      var ctx = canvas.getContext('2d');
+      var scoreEl = document.getElementById('dino-score');
+      var bestEl = document.getElementById('dino-best');
+      var muteBtn = document.getElementById('dino-mute');
+      var duckBtn = document.getElementById('dino-duck');
+      var best = 0;
+      try { best = parseInt(localStorage.getItem('jrf-dino-best') || '0', 10) || 0; } catch(e){}
+      bestEl.textContent = best;
+
+      var STAND_H = 26, DUCK_H = 14, DINO_W = 24;
+      var groundY = 128;
+      var dino, obstacles, clouds, speed, distance, running, over, lastTime, spawnTimer, frame, duckHeld;
+
+      var muted = true;
+      try { muted = localStorage.getItem('jrf-dino-muted') !== '0'; } catch(e){}
+      var audioCtx = null;
+      function updateMuteBtn(){ muteBtn.textContent = muted ? '🔇' : '🔈'; }
+      updateMuteBtn();
+      function ensureAudio(){
+        if (!audioCtx){ try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){} }
+      }
+      function beep(freq, dur, type, gain){
+        if (muted || !audioCtx) return;
+        var o = audioCtx.createOscillator();
+        var g = audioCtx.createGain();
+        o.type = type;
+        o.frequency.value = freq;
+        g.gain.value = gain;
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start();
+        g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
+        o.stop(audioCtx.currentTime + dur);
+      }
+      function playJumpSound(){ beep(520, 0.12, 'square', 0.05); }
+      function playHitSound(){ beep(160, 0.25, 'sawtooth', 0.07); }
+      muteBtn.addEventListener('click', function(){
+        ensureAudio();
+        muted = !muted;
+        try { localStorage.setItem('jrf-dino-muted', muted ? '1' : '0'); } catch(e){}
+        updateMuteBtn();
+      });
+
+      function reset(){
+        dino = { x: 26, y: groundY - STAND_H, w: DINO_W, h: STAND_H, vy: 0, onGround: true };
+        obstacles = [];
+        clouds = [
+          { x: 60, y: 24, s: 1 },
+          { x: 180, y: 42, s: 0.7 },
+          { x: 280, y: 18, s: 0.85 }
+        ];
+        speed = 180;
+        distance = 0;
+        running = false;
+        over = false;
+        duckHeld = false;
+        frame = 0;
+        spawnTimer = 60;
+        scoreEl.textContent = 0;
+        lastTime = null;
+        draw();
+      }
+      function jump(){
+        ensureAudio();
+        if (over){ reset(); return; }
+        if (!running){ running = true; lastTime = null; requestAnimationFrame(loop); }
+        if (dino.onGround && !duckHeld){ dino.vy = -330; dino.onGround = false; playJumpSound(); }
+      }
+      function setDuck(v){
+        duckHeld = v;
+        if (!running && !over) draw();
+      }
+      function spawnObstacle(){
+        var canBePlane = distance > 15;
+        if (canBePlane && Math.random() < 0.35){
+          obstacles.push({ type: 'plane', x: canvas.width + 10, y: groundY - 32, w: 24, h: 12 });
+        } else {
+          var h = 18 + Math.random()*16;
+          obstacles.push({ type: 'stack', x: canvas.width + 10, y: groundY - h, w: 16 + Math.random()*8, h: h, books: 1 + Math.floor(Math.random()*3) });
+        }
+      }
+      function loop(ts){
+        if (!running) return;
+        if (lastTime === null) lastTime = ts;
+        var dt = Math.min((ts - lastTime) / 1000, 0.05);
+        lastTime = ts;
+        frame++;
+
+        if (dino.onGround){
+          dino.h = duckHeld ? DUCK_H : STAND_H;
+          dino.y = groundY - dino.h;
+          dino.vy = 0;
+        } else {
+          dino.h = STAND_H;
+          var g = duckHeld ? 900 * 2.2 : 900;
+          dino.vy += g * dt;
+          dino.y += dino.vy * dt;
+          var floorY = groundY - dino.h;
+          if (dino.y >= floorY){ dino.y = floorY; dino.vy = 0; dino.onGround = true; }
+        }
+
+        speed += dt * 6;
+        distance += speed * dt * 0.06;
+        scoreEl.textContent = Math.floor(distance);
+
+        clouds.forEach(function(c){
+          c.x -= 12 * dt;
+          if (c.x < -30) c.x = canvas.width + 30;
+        });
+
+        spawnTimer -= 1;
+        if (spawnTimer <= 0){
+          spawnObstacle();
+          spawnTimer = Math.max(30, 55 + Math.random()*45 - Math.min(speed-180, 60));
+        }
+        obstacles.forEach(function(o){ o.x -= speed * dt; });
+        obstacles = obstacles.filter(function(o){ return o.x + o.w > -10; });
+
+        for (var i=0;i<obstacles.length;i++){
+          var o = obstacles[i];
+          var pad = 4;
+          if (dino.x+pad < o.x+o.w && dino.x+dino.w-pad > o.x && dino.y+pad < o.y+o.h && dino.y+dino.h-pad > o.y){
+            gameOver();
+            break;
+          }
+        }
+
+        draw();
+        if (running) requestAnimationFrame(loop);
+      }
+      function gameOver(){
+        running = false;
+        over = true;
+        playHitSound();
+        var d = Math.floor(distance);
+        if (d > best){ best = d; bestEl.textContent = best; try { localStorage.setItem('jrf-dino-best', String(best)); } catch(e){} }
+        draw();
+      }
+      function roundedRect(x, y, w, h, r){
+        ctx.beginPath();
+        if (ctx.roundRect){ ctx.roundRect(x, y, w, h, r); }
+        else { ctx.rect(x, y, w, h); }
+      }
+      function draw(){
+        var p = gamePalette();
+        ctx.fillStyle = p.paper;
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+        ctx.strokeStyle = p.grid;
+        ctx.lineWidth = 1;
+        for (var x=0;x<=canvas.width;x+=20){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,canvas.height); ctx.stroke(); }
+        for (var y=0;y<=canvas.height;y+=20){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(canvas.width,y); ctx.stroke(); }
+
+        ctx.strokeStyle = p.grid;
+        ctx.lineWidth = 1.5;
+        clouds.forEach(function(c){
+          ctx.beginPath();
+          ctx.arc(c.x, c.y, 8*c.s, 0, Math.PI*2);
+          ctx.arc(c.x+10*c.s, c.y+3*c.s, 6*c.s, 0, Math.PI*2);
+          ctx.arc(c.x-9*c.s, c.y+4*c.s, 6*c.s, 0, Math.PI*2);
+          ctx.stroke();
+        });
+
+        ctx.strokeStyle = p.red;
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([5,4]);
+        ctx.lineDashOffset = -distance * 3;
+        ctx.beginPath(); ctx.moveTo(0, groundY+1); ctx.lineTo(canvas.width, groundY+1); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.lineDashOffset = 0;
+
+        obstacles.forEach(function(o){
+          if (o.type === 'plane'){
+            ctx.strokeStyle = p.pen;
+            ctx.lineWidth = 1.6;
+            ctx.lineJoin = 'round';
+            ctx.beginPath();
+            ctx.moveTo(o.x, o.y+o.h*0.7);
+            ctx.lineTo(o.x+o.w*0.85, o.y);
+            ctx.lineTo(o.x+o.w*0.5, o.y+o.h*0.4);
+            ctx.lineTo(o.x+o.w, o.y+o.h*0.35);
+            ctx.lineTo(o.x+o.w*0.5, o.y+o.h*0.55);
+            ctx.lineTo(o.x+o.w*0.65, o.y+o.h);
+            ctx.closePath();
+            ctx.stroke();
+          } else {
+            var bh = o.h / o.books;
+            for (var b=0;b<o.books;b++){
+              ctx.strokeStyle = p.leaf;
+              ctx.lineWidth = 2;
+              ctx.strokeRect(o.x, o.y + b*bh, o.w, bh-2);
+            }
+          }
+        });
+
+        var legPhase = Math.floor(frame/6) % 2;
+        ctx.strokeStyle = p.pen;
+        ctx.lineWidth = 3;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        roundedRect(dino.x, dino.y, dino.w, dino.h, [6,6,2,2]);
+        ctx.stroke();
+        // tête / museau
+        ctx.beginPath();
+        ctx.moveTo(dino.x+dino.w*0.65, dino.y);
+        ctx.lineTo(dino.x+dino.w*0.92, dino.y-dino.h*0.28);
+        ctx.lineTo(dino.x+dino.w, dino.y+dino.h*0.18);
+        ctx.stroke();
+        // queue
+        ctx.beginPath();
+        ctx.moveTo(dino.x+3, dino.y+dino.h*0.35);
+        ctx.lineTo(dino.x-7, dino.y+dino.h*0.05);
+        ctx.stroke();
+        // pattes
+        ctx.beginPath();
+        if (dino.onGround){
+          if (legPhase===0){
+            ctx.moveTo(dino.x+4, dino.y+dino.h*0.8); ctx.lineTo(dino.x+2, dino.y+dino.h+6);
+            ctx.moveTo(dino.x+dino.w-4, dino.y+dino.h*0.8); ctx.lineTo(dino.x+dino.w, dino.y+dino.h+2);
+          } else {
+            ctx.moveTo(dino.x+4, dino.y+dino.h*0.8); ctx.lineTo(dino.x+2, dino.y+dino.h+2);
+            ctx.moveTo(dino.x+dino.w-4, dino.y+dino.h*0.8); ctx.lineTo(dino.x+dino.w, dino.y+dino.h+6);
+          }
+        } else {
+          ctx.moveTo(dino.x+4, dino.y+dino.h*0.8); ctx.lineTo(dino.x, dino.y+dino.h*0.95);
+          ctx.moveTo(dino.x+dino.w-4, dino.y+dino.h*0.8); ctx.lineTo(dino.x+dino.w+2, dino.y+dino.h*0.95);
+        }
+        ctx.stroke();
+        ctx.fillStyle = p.ink;
+        ctx.beginPath(); ctx.arc(dino.x+dino.w*0.82, dino.y+dino.h*0.18, 1.6, 0, Math.PI*2); ctx.fill();
+
+        if (!running && !over){
+          ctx.fillStyle = p.ink;
+          ctx.font = "600 17px 'Caveat', cursive";
+          ctx.textAlign = 'center';
+          ctx.fillText('Espace ou tap pour sauter', canvas.width/2, canvas.height/2 - 10);
+          ctx.font = "600 15px 'Caveat', cursive";
+          ctx.fillText('(flèche bas pour esquiver les avions)', canvas.width/2, canvas.height/2 + 12);
+        }
+        if (over){
+          ctx.fillStyle = 'rgba(0,0,0,0.35)';
+          ctx.fillRect(0,0,canvas.width,canvas.height);
+          ctx.fillStyle = p.red;
+          ctx.font = "700 24px 'Caveat', cursive";
+          ctx.textAlign = 'center';
+          ctx.fillText('Aïe — ' + Math.floor(distance) + ' m', canvas.width/2, canvas.height/2 - 6);
+          ctx.font = "600 15px 'Caveat', cursive";
+          ctx.fillText('Clique ou espace pour rejouer', canvas.width/2, canvas.height/2 + 18);
+        }
+      }
+
+      canvas.addEventListener('keydown', function(e){
+        var k = e.key.toLowerCase();
+        if (k===' ' || k==='arrowup'){ e.preventDefault(); jump(); }
+        else if (k==='arrowdown' || k==='s'){ e.preventDefault(); setDuck(true); }
+      });
+      canvas.addEventListener('keyup', function(e){
+        var k = e.key.toLowerCase();
+        if (k==='arrowdown' || k==='s'){ setDuck(false); }
+      });
+      canvas.addEventListener('click', function(){ canvas.focus(); jump(); });
+      canvas.addEventListener('touchstart', function(e){ e.preventDefault(); canvas.focus(); jump(); }, {passive:false});
+
+      duckBtn.addEventListener('mousedown', function(){ canvas.focus(); setDuck(true); });
+      duckBtn.addEventListener('mouseup', function(){ setDuck(false); });
+      duckBtn.addEventListener('mouseleave', function(){ setDuck(false); });
+      duckBtn.addEventListener('touchstart', function(e){ e.preventDefault(); canvas.focus(); setDuck(true); }, {passive:false});
+      duckBtn.addEventListener('touchend', function(e){ e.preventDefault(); setDuck(false); }, {passive:false});
+
+      reset();
+    })();
+  })();
+</script>
